@@ -119,7 +119,7 @@ bool FindWhiteLine(Vec3b white)
             return color;
 }
 // extends the line until whiteline is found
-Point DrawingLines(Mat img , Point point,bool right)
+Point DrawingLines(Mat img, Point point, bool right)
 {
            int cols = img.cols;
            Vec3b drawingLine = img.at<Vec3b>(point); //defines the color at current positions
@@ -127,6 +127,9 @@ Point DrawingLines(Mat img , Point point,bool right)
             if(right == true)
             {
             point.x = point.x +1; //increases the line too the right
+            // FILE* pFile = std::fopen("log.txt","a");
+            // fprintf(pFile, point.x);
+            // fflush(pFile);
             drawingLine = img.at<cv::Vec3b>(point); 
             if(FindWhiteLine(drawingLine)){ // quites incase white line is found
                 break; 
@@ -164,70 +167,74 @@ Point DrawingLines(Mat img , Point point,bool right)
         //int intersection = 0;
         //Points 
         // Needs more points
-        // Be prepaired for a mindfuck
+        // Be prepaired for a mindfuck --> YOU DON'T SAY?
         // currently 3 lines per side
-        Point centerPoint;             
-        Point centerPointEnd;  
-        Point bRightPoint;  
-        Point bRightPointEnd; 
-        Point bRightPointmid;
-        Point rightPointMidEnd; 
-        Point rightPointTop;
-        Point rightPointTopEnd;
-        Point bLeftPoint;         
-        Point lMidPoint; 
-        Point lMidPointEnd;  
-        Point ltopPoint; 
-        Point ltopPointEnd;  
+        Point center;             
+        Point centerEnd;  
 
-        centerPoint.x=cols/2;   
-        centerPoint.y=0; 
-        centerPointEnd.x=cols/2;   
-        centerPointEnd.y=rows; 
-        bRightPoint.x = cols/2; 
-        bRightPoint.y = 350;
-        bRightPointmid.x=cols/2; 
-        bRightPointmid.y =325;
-        rightPointTop.x = cols/2; 
-        rightPointTop.y = 275; 
+        Point rightTop; // right top
+        Point rightTopEnd; // right top end
+        
+        Point rightMid; // right mid
+        Point rightMidEnd; // right mid end
 
-        rightPointTopEnd.x =rightPointTop.x;
-        rightPointTopEnd.y = rightPointTop.y;
-        rightPointMidEnd.x = bRightPointmid.x; 
-        rightPointMidEnd.y = bRightPointmid.y;
+        Point rightBot; //right bot  
+        Point rightBotEnd; //right bot end
+        
+        Point leftBot;    //left bot
 
-        bRightPointEnd.x = bRightPoint.x; 
-        bRightPointEnd.y = bRightPoint.y;
-        bLeftPoint.x = bRightPoint.x;
-        bLeftPoint.y = bRightPoint.y;
+        Point leftTop; //left top
+        Point leftTopEnd;  //left top end
+        
+        Point leftMid; // left mid
+        Point leftMidEnd;  // left mid end
 
-        ltopPoint.x = bRightPoint.x; 
-        ltopPoint.y = 275;
-        ltopPointEnd.x = bRightPoint.x;  
-        ltopPointEnd.y = ltopPoint.y;
-
-        lMidPoint.x = bRightPoint.x; 
-        lMidPoint.y = 325;
-        lMidPointEnd.x = bRightPoint.x;  
-        lMidPointEnd.y = lMidPoint.y;
+        center.x=cols/2;   
+        center.y=0; 
+        centerEnd.x=cols/2;   
+        centerEnd.y=rows; 
+        
+        rightBot.x = cols/2; 
+        rightBot.y = 350;
+        rightMid.x =cols/2; 
+        rightMid.y = 325;
+        rightTop.x = cols/2; 
+        rightTop.y = 275; 
+        rightTopEnd.x = rightTop.x;
+        rightTopEnd.y = rightTop.y;
+        rightMidEnd.x = rightMid.x; 
+        rightMidEnd.y = rightMid.y;
+        rightBotEnd.x = rightBot.x; 
+        rightBotEnd.y = rightBot.y;
+        
+        leftBot.x = rightBot.x;
+        leftBot.y = rightBot.y;
+        leftTop.x = rightBot.x; 
+        leftTop.y = 275;
+        leftMid.x = rightBot.x; 
+        leftMid.y = 325;
+        leftTopEnd.x = rightBot.x;  
+        leftTopEnd.y = leftTop.y;
+        leftMidEnd.x = rightBot.x;  
+        leftMidEnd.y = leftMid.y;
 
 // assigns the point the extended value 
-        bLeftPoint =DrawingLines(matImg,bLeftPoint,false);
-        bRightPointEnd=DrawingLines(matImg,bRightPointEnd,true);
-        bRightPointmid=DrawingLines(matImg,bRightPointmid,true);
-        rightPointTopEnd =DrawingLines(matImg,rightPointTopEnd,true);
-        lMidPointEnd =DrawingLines(matImg,lMidPointEnd,false);
-        ltopPointEnd =DrawingLines(matImg,ltopPointEnd,false);
+        leftBot =DrawingLines(matImg,leftBot,false);
+        rightBotEnd=DrawingLines(matImg,rightBotEnd,true);
+        rightMid=DrawingLines(matImg,rightMid,true);
+        rightTopEnd =DrawingLines(matImg,rightTopEnd,true);
+        leftMidEnd =DrawingLines(matImg,leftMidEnd,false);
+        leftTopEnd =DrawingLines(matImg,leftTopEnd,false);
 
        if (m_debug) {
           //http://docs.opencv.org/doc/tutorials/core/basic_geometric_drawing/basic_geometric_drawing.html
-               line(matImg, centerPoint,centerPointEnd,cvScalar(0, 0, 255),2, 8); //centralline
-               line(matImg, bRightPoint,bRightPointEnd,cvScalar(0, 165, 255),1, 8); //bottom right line
-               line(matImg, lMidPoint,lMidPointEnd,cvScalar(255, 225, 0),1, 8); //LeftMid line
-               line(matImg, bRightPoint,bLeftPoint,cvScalar(255, 0, 0),1, 8);//LeftBottom line
-               line(matImg, ltopPoint,ltopPointEnd,cvScalar(130, 0, 75),1, 8); //TopLeft line
-               line(matImg, bRightPointmid,rightPointMidEnd,cvScalar(238, 130, 238),1, 8); //rightmid line
-               line(matImg, rightPointTop,rightPointTopEnd,cvScalar(52, 64, 76),1, 8); //TopRight line
+               line(matImg, center,centerEnd,cvScalar(0, 0, 255),2, 8); //centralline
+               line(matImg, leftTop,leftTopEnd,cvScalar(130, 0, 75),1, 8); //LeftTop line
+               line(matImg, leftMid,leftMidEnd,cvScalar(255, 225, 0),1, 8); //LeftMid line
+               line(matImg, rightBot,leftBot,cvScalar(255, 0, 0),1, 8);//LeftBottom line
+               line(matImg, rightTop,rightTopEnd,cvScalar(52, 64, 76),1, 8); //RightTop line
+               line(matImg, rightMid,rightMidEnd,cvScalar(238, 130, 238),1, 8); //RightMid line
+               line(matImg, rightBot,rightBotEnd,cvScalar(0, 165, 255),1, 8); //RightBot line
          imshow("Lanedetection", matImg);
          cvWaitKey(10);
 }
@@ -235,10 +242,10 @@ Point DrawingLines(Mat img , Point point,bool right)
         ///////INTERSECTION HANDLING////////
 ////////////////SIMPLICITY IS THE ULTIMATE COMPLICATION///////////////
         SteeringData sd;
-        if ((FindWhiteLine(rightPointTopEnd.x)==false) && (FindWhiteLine(ltopPointEnd.x)==false)){
+        if ((FindWhiteLine(rightTopEnd.x)==false) && (FindWhiteLine(leftTopEnd.x)==false)){
             //intersection = 1;
-            cout << "Mode: Intersection" << endl;
-            sd.setExampleData(0);
+            //cout << "Mode: Intersection" << endl;
+            sd.setExampleData(20);
         }
 
 
@@ -247,12 +254,15 @@ Point DrawingLines(Mat img , Point point,bool right)
         //Need too make dynamic steering
         //SteeringData sd;
         //((bRightPointEnd.x < 478 && rightPointTopEnd.x>280)
-        if(bRightPointmid.x < 478 && rightPointTopEnd.x>300)
-        {
+        //if(rightMid.x < 478 && rightTopEnd.x>300)
+        if(rightMid.x < 500 && rightTopEnd.x > 300){
         sd.setExampleData(-10);
-        }
-        else if(bLeftPoint.x > 190 || lMidPointEnd.x > 190 || ltopPointEnd.x > 200)
-        {
+        //if ((rightTopEnd.x > 500 && leftTopEnd.x < 200) && (rightMidEnd.x > 500 && leftMidEnd.x < 200) && (rightBot.x > 500 && leftBot.x < 200))
+        //{
+        //sd.setExampleData(-10);
+        //}else if(rightTopEnd.x == leftTopEnd.x){
+          //  sd.setExampleData(0);
+        }else if(leftBot.x > 190 || leftMidEnd.x > 190 || leftTopEnd.x > 200){
         sd.setExampleData(14);
         }
 
