@@ -33,6 +33,7 @@
 #include "tools/player/Player.h"
 #include "GeneratedHeaders_Data.h"
 #include "LaneDetector.h"
+#include "core/data/control/VehicleControl.h" //vc
 
 using namespace cv;
 
@@ -43,6 +44,7 @@ namespace msv {
     using namespace core::data;
     using namespace core::data::image;
     using namespace tools::player;
+    using namespace core::data::control; //vc
 
     LaneDetector::LaneDetector(const int32_t &argc, char **argv) : ConferenceClientModule(argc, argv, "lanedetector"),
         m_hasAttachedToSharedImageMemory(false),
@@ -114,28 +116,27 @@ bool FindWhiteLine(Vec3b white)
     uchar red = white.val[2];
     if(blue == 255 && green == 255 && red == 255)
             {
-                color = true;
+            color = true;
             }
             return color;
 }
 // extends the line until whiteline is found
 Point DrawingLines(Mat img, Point point, bool right)
 {
-           int cols = img.cols;
-           Vec3b drawingLine = img.at<Vec3b>(point); //defines the color at current positions
-           while(point.x != cols){
+        int cols = img.cols;
+        Vec3b drawingLine = img.at<Vec3b>(point); //defines the color at current positions
+           
+        while(point.x != cols){
             if(right == true)
             {
             point.x = point.x +1; //increases the line too the right
-            // FILE* pFile = std::fopen("log.txt","a");
-            // fprintf(pFile, point.x);
-            // fflush(pFile);
             drawingLine = img.at<cv::Vec3b>(point); 
             if(FindWhiteLine(drawingLine)){ // quites incase white line is found
                 break; 
             }
         }
-        else if(right == false)
+    
+            else if(right == false)
             {
             point.x = point.x -1; //Decrease the line too the left
             drawingLine = img.at<cv::Vec3b>(point); 
@@ -146,6 +147,34 @@ Point DrawingLines(Mat img, Point point, bool right)
     }
            return point;
 }
+
+Point DrawingVertical(Mat img, Point point, bool top)
+{
+        int rows = img.rows;
+        Vec3b drawVertical = img.at<Vec3b>(point);
+
+        while(point.y != rows){
+            if(top == true)
+            {
+            point.y = point.y+1; 
+            drawVertical = img.at<cv::Vec3b>(point); 
+            if(FindWhiteLine(drawVertical)){
+                break; 
+            }
+        }
+            else if (top == false)
+            {
+            point.y = point.y-1;
+            drawVertical = img.at<cv::Vec3b>(point);
+            if(FindWhiteLine(drawVertical)){
+                break; 
+            }
+        }
+    }
+        return point;
+}
+
+
     // You should start your work in this method.
     // written by Nicolas Kheirallah
     void LaneDetector::processImage() {
@@ -164,10 +193,9 @@ Point DrawingLines(Mat img, Point point, bool right)
         int rows = matImg.rows;
         int cols = matImg.cols;
 
-        //int intersection = 0;
         //Points 
         // Needs more points
-        // Be prepaired for a mindfuck --> YOU DON'T SAY?
+        // Be prepaired for a mindfuck --> re: don't worry I changed the names already. (also, it's "prepared")
         // currently 3 lines per side
         Point center;             
         Point centerEnd;  
@@ -192,7 +220,7 @@ Point DrawingLines(Mat img, Point point, bool right)
         center.x=cols/2;   
         center.y=0; 
         centerEnd.x=cols/2;   
-        centerEnd.y=rows; 
+        centerEnd.y=rows/2;
         
         rightBot.x = cols/2; 
         rightBot.y = 350;
@@ -218,15 +246,36 @@ Point DrawingLines(Mat img, Point point, bool right)
         leftMidEnd.x = rightBot.x;  
         leftMidEnd.y = leftMid.y;
 
-// assigns the point the extended value 
-        leftBot =DrawingLines(matImg,leftBot,false);
-        rightBotEnd=DrawingLines(matImg,rightBotEnd,true);
-        rightMid=DrawingLines(matImg,rightMid,true);
-        rightTopEnd =DrawingLines(matImg,rightTopEnd,true);
-        leftMidEnd =DrawingLines(matImg,leftMidEnd,false);
-        leftTopEnd =DrawingLines(matImg,leftTopEnd,false);
 
-       if (m_debug) {
+
+        //////////vertical lines////////
+        Point verticalLeft;
+        Point verticalLeftEnd;
+        Point verticalRight;
+        Point verticalRightEnd;
+
+        verticalLeft.x = cols/2+40;
+        verticalLeft.y = 0;
+        verticalLeftEnd.x = cols/2+40;
+        verticalLeftEnd.y = rows/2;
+
+        verticalRight.x = cols/2-40;
+        verticalRight.y = 0;
+        verticalRightEnd.x = cols/2-40;
+        verticalRightEnd.y = rows/2;
+
+        centerEnd = DrawingVertical(matImg, centerEnd, true);
+        verticalLeftEnd = DrawingVertical(matImg, verticalLeftEnd, true);
+        verticalRightEnd = DrawingVertical(matImg, verticalRightEnd, true);
+// assigns the point the extended value 
+        leftBot = DrawingLines(matImg,leftBot,false);
+        rightBotEnd = DrawingLines(matImg,rightBotEnd,true);
+        rightMid = DrawingLines(matImg,rightMid,true);
+        rightTopEnd = DrawingLines(matImg,rightTopEnd,true);
+        leftMidEnd = DrawingLines(matImg,leftMidEnd,false);
+        leftTopEnd = DrawingLines(matImg,leftTopEnd,false);
+
+        if (m_debug) {
           //http://docs.opencv.org/doc/tutorials/core/basic_geometric_drawing/basic_geometric_drawing.html
                line(matImg, center,centerEnd,cvScalar(0, 0, 255),2, 8); //centralline
                line(matImg, leftTop,leftTopEnd,cvScalar(130, 0, 75),1, 8); //LeftTop line
@@ -235,21 +284,35 @@ Point DrawingLines(Mat img, Point point, bool right)
                line(matImg, rightTop,rightTopEnd,cvScalar(52, 64, 76),1, 8); //RightTop line
                line(matImg, rightMid,rightMidEnd,cvScalar(238, 130, 238),1, 8); //RightMid line
                line(matImg, rightBot,rightBotEnd,cvScalar(0, 165, 255),1, 8); //RightBot line
-         imshow("Lanedetection", matImg);
-         cvWaitKey(10);
+
+               line(matImg, verticalLeft, verticalLeftEnd, cvScalar(0, 0, 255),1 , 8);
+               line(matImg, verticalRight, verticalRightEnd, cvScalar(0, 0, 255),1 , 8);
+
+        imshow("Lanedetection", matImg);
+        cvWaitKey(10);
 }
         
-        ///////INTERSECTION HANDLING////////
-////////////////SIMPLICITY IS THE ULTIMATE COMPLICATION///////////////
+
+////////////////Simplicity is the ultimate sophistication.///////////////
         SteeringData sd;
-        if ((FindWhiteLine(rightTopEnd.x)==false) && (FindWhiteLine(leftTopEnd.x)==false)){
-            //intersection = 1;
-            //cout << "Mode: Intersection" << endl;
-            sd.setExampleData(20);
-        }
-
-
-        
+        VehicleControl vc;
+        // if all 3 vertical lines detects white pixels && left and right are empty
+if ((FindWhiteLine(verticalLeftEnd.y)==true) && (FindWhiteLine(verticalRightEnd.y)==true)){
+    if ((FindWhiteLine(centerEnd.y)==true)){
+        sd.setExampleData(20);
+        //vc.setSpeed(0);
+    }
+}
+// {
+       
+//         // if((FindWhiteLine(rightTopEnd.x)==false) && (FindWhiteLine(leftTopEnd.x)==false))
+//         // {
+//         //      //keep going
+//         //     cout << "State: Intersection" << endl;
+//         //     sd.setExampleData(0);
+//         //     vc.setSpeed(0);
+//         // }
+// }
 
         //Need too make dynamic steering
         //SteeringData sd;
@@ -257,11 +320,6 @@ Point DrawingLines(Mat img, Point point, bool right)
         //if(rightMid.x < 478 && rightTopEnd.x>300)
         if(rightMid.x < 500 && rightTopEnd.x > 300){
         sd.setExampleData(-10);
-        //if ((rightTopEnd.x > 500 && leftTopEnd.x < 200) && (rightMidEnd.x > 500 && leftMidEnd.x < 200) && (rightBot.x > 500 && leftBot.x < 200))
-        //{
-        //sd.setExampleData(-10);
-        //}else if(rightTopEnd.x == leftTopEnd.x){
-          //  sd.setExampleData(0);
         }else if(leftBot.x > 190 || leftMidEnd.x > 190 || leftTopEnd.x > 200){
         sd.setExampleData(14);
         }
@@ -277,7 +335,6 @@ Point DrawingLines(Mat img, Point point, bool right)
         Container c(Container::USER_DATA_1, sd);
         // Send container.
         getConference().send(c);
-    
 }
 
     // This method will do the main data processing job.
