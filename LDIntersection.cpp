@@ -46,6 +46,10 @@ namespace msv {
     using namespace tools::player;
     using namespace core::data::control; //vc
 
+    SteeringData sd;
+    VehicleControl vc;
+    int intersection = 0;
+
     LaneDetector::LaneDetector(const int32_t &argc, char **argv) : ConferenceClientModule(argc, argv, "lanedetector"),
         m_hasAttachedToSharedImageMemory(false),
         m_sharedImageMemory(),
@@ -134,8 +138,7 @@ Point DrawingLines(Mat img, Point point, bool right)
             if(FindWhiteLine(drawingLine)){ // quites incase white line is found
                 break; 
             }
-        }
-    
+        } 
             else if(right == false)
             {
             point.x = point.x -1; //Decrease the line too the left
@@ -152,25 +155,22 @@ Point DrawingVertical(Mat img, Point point, bool top)
 {
         int rows = img.rows;
         Vec3b drawVertical = img.at<Vec3b>(point);
+        Vec3b drawingLine = img.at<Vec3b>(point);
 
-        while(point.y != rows){
-            if(top == true)
+        while(point.y != rows/2+70){
+            if(top == false)
             {
-            point.y = point.y+1; 
+            point.y = point.y-1; 
             drawVertical = img.at<cv::Vec3b>(point); 
-            if(FindWhiteLine(drawVertical)){
-                break; 
+                if(FindWhiteLine(drawVertical)==true){
+                    if (FindWhiteLine(drawingLine)==false){
+                        intersection = 1;
+                        cout << "State: Intersection" << endl;
+                        break;
+                    }
+                }
             }
-        }
-            else if (top == false)
-            {
-            point.y = point.y-1;
-            drawVertical = img.at<cv::Vec3b>(point);
-            if(FindWhiteLine(drawVertical)){
-                break; 
-            }
-        }
-    }
+        } 
         return point;
 }
 
@@ -192,8 +192,6 @@ Point DrawingVertical(Mat img, Point point, bool top)
         // get matrix size  http://docs.opencv.org/modules/core/doc/basic_structures.html
         int rows = matImg.rows;
         int cols = matImg.cols;
-
-        int intersection = 0;
 
         //Points 
         // Needs more points
@@ -242,31 +240,31 @@ Point DrawingVertical(Mat img, Point point, bool top)
         leftMidEnd.y = leftMid.y;
 
         center.x = cols/2;   
-        center.y = 0; 
+        center.y = rows; 
         centerEnd.x = center.x;   
-        centerEnd.y = rows/2;
+        centerEnd.y = rows-100;
 
 
-        //////////vertical lines////////
+        //vertical lines
         Point verticalLeft;
         Point verticalLeftEnd;
         Point verticalRight;
         Point verticalRightEnd;
 
-        verticalLeft.x = cols/2+70;
-        verticalLeft.y = 0;
-        verticalLeftEnd.x = verticalLeft.x;
-        verticalLeftEnd.y = rows/2;
-
-        verticalRight.x = cols/2-70;
-        verticalRight.y = 0;
+        verticalRight.x = cols/2+50;
+        verticalRight.y = rows;
         verticalRightEnd.x = verticalRight.x;
-        verticalRightEnd.y = rows/2;
+        verticalRightEnd.y = rows-100;
 
-        //vertical
-        centerEnd = DrawingVertical(matImg, centerEnd, true);
-        verticalLeftEnd = DrawingVertical(matImg, verticalLeftEnd, true);
-        verticalRightEnd = DrawingVertical(matImg, verticalRightEnd, true);
+        verticalLeft.x = cols/2-50;
+        verticalLeft.y = rows;
+        verticalLeftEnd.x = verticalLeft.x;
+        verticalLeftEnd.y = rows-100;
+
+        //draw vertical
+        centerEnd = DrawingVertical(matImg, centerEnd, false);
+        verticalLeftEnd = DrawingVertical(matImg, verticalLeftEnd, false);
+        verticalRightEnd = DrawingVertical(matImg, verticalRightEnd, false);
         // assigns the point the extended value for horizonral lines
         rightTopEnd = DrawingLines(matImg,rightTopEnd,true);
         rightMid = DrawingLines(matImg,rightMid,true);
@@ -290,36 +288,17 @@ Point DrawingVertical(Mat img, Point point, bool top)
         imshow("Lanedetection", matImg);
         cvWaitKey(10);
         }
-        
 
-        // detect intersection
-        SteeringData sd;
-        VehicleControl vc;
-        // if all 3 vertical lines detects white pixels && right is empty
-        if ((FindWhiteLine(verticalLeftEnd.y)==true) && (FindWhiteLine(verticalRightEnd.y)==true)){
-            if (FindWhiteLine(centerEnd.y)==true){
-                intersection = 1;
-                cout << "State: Intersection" << endl; //so far the program does not detect....
-            }
-        }
-
-        // if((FindWhiteLine(rightTopEnd.x)==false) && (FindWhiteLine(leftTopEnd.x)==false)){           
-        // //keep going
-        // cout << "State: Intersection" << endl;
-        //     sd.setExampleData(20);
-        //     vc.setSpeed(0);
-        // }
 
         //Need too make dynamic steering
-        //SteeringData sd;
-        if(intersection == 0){
+        if (intersection == 1)
+        {
             if(rightMid.x < 478 && rightTopEnd.x > 280){
             sd.setExampleData(-10);
-                }else if(leftBot.x > 190 || leftMidEnd.x > 190 || leftTopEnd.x > 200){
+            }
+            else if(leftBot.x > 190 || leftMidEnd.x > 190 || leftTopEnd.x > 200){
                 sd.setExampleData(14);
-                }
-        }else if(intersection == 1){
-        sd.setExampleData(0);
+            }
         }
 
         //TODO: Start here.
