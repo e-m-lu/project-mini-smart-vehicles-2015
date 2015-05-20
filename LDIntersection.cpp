@@ -268,12 +268,12 @@ Point DrawingVertical(Mat img, Point point, bool top)
         verticalLeftEnd = DrawingVertical(matImg, verticalLeftEnd, true);
         verticalRightEnd = DrawingVertical(matImg, verticalRightEnd, true);
         // assigns the point the extended value for horizonral lines
-        leftBot = DrawingLines(matImg,leftBot,false);
-        rightBotEnd = DrawingLines(matImg,rightBotEnd,true);
-        rightMid = DrawingLines(matImg,rightMid,true);
         rightTopEnd = DrawingLines(matImg,rightTopEnd,true);
-        leftMidEnd = DrawingLines(matImg,leftMidEnd,false);
+        rightMid = DrawingLines(matImg,rightMid,true);
+        rightBotEnd = DrawingLines(matImg,rightBotEnd,true);
         leftTopEnd = DrawingLines(matImg,leftTopEnd,false);
+        leftMidEnd = DrawingLines(matImg,leftMidEnd,false);
+        leftBot = DrawingLines(matImg,leftBot,false);
 
         if (m_debug) {
           //http://docs.opencv.org/doc/tutorials/core/basic_geometric_drawing/basic_geometric_drawing.html
@@ -300,17 +300,15 @@ Point DrawingVertical(Mat img, Point point, bool top)
             if (FindWhiteLine(centerEnd.y)==true){
                 intersection = 1;
                 cout << "State: Intersection" << endl; //so far the program does not detect....
-            // sd.setExampleData(20);
-            // vc.setSpeed(0);
             }
         }
 
-        //if((FindWhiteLine(rightTopEnd.x)==false) && (FindWhiteLine(leftTopEnd.x)==false)){           
-        //keep going
-        //cout << "State: Intersection" << endl;
-            //sd.setExampleData(20);
-            //vc.setSpeed(0);
-        //}
+        // if((FindWhiteLine(rightTopEnd.x)==false) && (FindWhiteLine(leftTopEnd.x)==false)){           
+        // //keep going
+        // cout << "State: Intersection" << endl;
+        //     sd.setExampleData(20);
+        //     vc.setSpeed(0);
+        // }
 
         //Need too make dynamic steering
         //SteeringData sd;
