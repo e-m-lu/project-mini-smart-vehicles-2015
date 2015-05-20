@@ -46,6 +46,9 @@ namespace msv {
     using namespace tools::player;
     using namespace core::data::control; //vc
 
+    SteeringData sd;
+    VehicleControl vc;
+
     LaneDetector::LaneDetector(const int32_t &argc, char **argv) : ConferenceClientModule(argc, argv, "lanedetector"),
         m_hasAttachedToSharedImageMemory(false),
         m_sharedImageMemory(),
@@ -160,6 +163,7 @@ Point DrawingVertical(Mat img, Point point, bool top)
                     //if (FindWhiteLine(drawingLine)==false){
                     //    intersection = 1;
                         cout << "State: Intersection" << endl;
+                        sd.setExampleData(0);
                         //break;
                     //}
                 }
@@ -272,7 +276,7 @@ Point DrawingVertical(Mat img, Point point, bool top)
          cvWaitKey(10);
 }
         //Need too make dynamic steering
-        SteeringData sd;
+        //SteeringData sd;
         //((bRightPointEnd.x < 478 && rightPointTopEnd.x>280)
         if(bRightPointmid.x < 478 && rightPointTopEnd.x>300)
         {
