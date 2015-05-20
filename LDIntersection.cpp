@@ -312,10 +312,8 @@ Point DrawingVertical(Mat img, Point point, bool top)
 
         //Need too make dynamic steering
         //SteeringData sd;
-        //((bRightPointEnd.x < 478 && rightPointTopEnd.x>280)
-        //if(rightMid.x < 478 && rightTopEnd.x>300)
         if(intersection == 0){
-            if(rightMid.x < 500 && rightTopEnd.x > 300){
+            if(rightMid.x < 478 && rightTopEnd.x > 280){
             sd.setExampleData(-10);
                 }else if(leftBot.x > 190 || leftMidEnd.x > 190 || leftTopEnd.x > 200){
                 sd.setExampleData(14);
