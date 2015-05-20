@@ -193,34 +193,29 @@ Point DrawingVertical(Mat img, Point point, bool top)
         int rows = matImg.rows;
         int cols = matImg.cols;
 
+        int intersection = 0;
+
         //Points 
         // Needs more points
         // Be prepaired for a mindfuck --> re: don't worry I changed the names already. (also, it's "prepared")
-        // currently 3 lines per side
-        Point center;             
-        Point centerEnd;  
+        // currently 3 lines per side  
 
         Point rightTop; // right top
-        Point rightTopEnd; // right top end
-        
+        Point rightTopEnd; // right top end 
         Point rightMid; // right mid
         Point rightMidEnd; // right mid end
-
         Point rightBot; //right bot  
         Point rightBotEnd; //right bot end
         
         Point leftBot;    //left bot
-
         Point leftTop; //left top
         Point leftTopEnd;  //left top end
-        
         Point leftMid; // left mid
         Point leftMidEnd;  // left mid end
+        
+        Point center;             
+        Point centerEnd;
 
-        center.x=cols/2;   
-        center.y=0; 
-        centerEnd.x=cols/2;   
-        centerEnd.y=rows/2;
         
         rightBot.x = cols/2; 
         rightBot.y = 350;
@@ -246,6 +241,10 @@ Point DrawingVertical(Mat img, Point point, bool top)
         leftMidEnd.x = rightBot.x;  
         leftMidEnd.y = leftMid.y;
 
+        center.x = cols/2;   
+        center.y = 0; 
+        centerEnd.x = center.x;   
+        centerEnd.y = rows/2;
 
 
         //////////vertical lines////////
@@ -254,20 +253,21 @@ Point DrawingVertical(Mat img, Point point, bool top)
         Point verticalRight;
         Point verticalRightEnd;
 
-        verticalLeft.x = cols/2+40;
+        verticalLeft.x = cols/2+70;
         verticalLeft.y = 0;
-        verticalLeftEnd.x = cols/2+40;
+        verticalLeftEnd.x = verticalLeft.x;
         verticalLeftEnd.y = rows/2;
 
-        verticalRight.x = cols/2-40;
+        verticalRight.x = cols/2-70;
         verticalRight.y = 0;
-        verticalRightEnd.x = cols/2-40;
+        verticalRightEnd.x = verticalRight.x;
         verticalRightEnd.y = rows/2;
 
+        //vertical
         centerEnd = DrawingVertical(matImg, centerEnd, true);
         verticalLeftEnd = DrawingVertical(matImg, verticalLeftEnd, true);
         verticalRightEnd = DrawingVertical(matImg, verticalRightEnd, true);
-// assigns the point the extended value 
+        // assigns the point the extended value for horizonral lines
         leftBot = DrawingLines(matImg,leftBot,false);
         rightBotEnd = DrawingLines(matImg,rightBotEnd,true);
         rightMid = DrawingLines(matImg,rightMid,true);
@@ -277,51 +277,53 @@ Point DrawingVertical(Mat img, Point point, bool top)
 
         if (m_debug) {
           //http://docs.opencv.org/doc/tutorials/core/basic_geometric_drawing/basic_geometric_drawing.html
-               line(matImg, center,centerEnd,cvScalar(0, 0, 255),2, 8); //centralline
-               line(matImg, leftTop,leftTopEnd,cvScalar(130, 0, 75),1, 8); //LeftTop line
-               line(matImg, leftMid,leftMidEnd,cvScalar(255, 225, 0),1, 8); //LeftMid line
-               line(matImg, rightBot,leftBot,cvScalar(255, 0, 0),1, 8);//LeftBottom line
-               line(matImg, rightTop,rightTopEnd,cvScalar(52, 64, 76),1, 8); //RightTop line
-               line(matImg, rightMid,rightMidEnd,cvScalar(238, 130, 238),1, 8); //RightMid line
-               line(matImg, rightBot,rightBotEnd,cvScalar(0, 165, 255),1, 8); //RightBot line
-
-               line(matImg, verticalLeft, verticalLeftEnd, cvScalar(0, 0, 255),1 , 8);
-               line(matImg, verticalRight, verticalRightEnd, cvScalar(0, 0, 255),1 , 8);
+            line(matImg, center, centerEnd, cvScalar(0, 0, 255), 2, 8); //centralline
+            line(matImg, leftTop, leftTopEnd, cvScalar(130, 0, 75), 1, 8); //LeftTop line
+            line(matImg, leftMid, leftMidEnd, cvScalar(255, 225, 0), 1, 8); //LeftMid line
+            line(matImg, rightBot, leftBot, cvScalar(255, 0, 0), 1, 8);//LeftBottom line
+            line(matImg, rightTop, rightTopEnd, cvScalar(52, 64, 76), 1, 8); //RightTop line
+            line(matImg, rightMid, rightMidEnd, cvScalar(238, 130, 238), 1, 8); //RightMid line
+            line(matImg, rightBot, rightBotEnd, cvScalar(0, 165, 255), 1, 8); //RightBot line
+            line(matImg, verticalLeft, verticalLeftEnd, cvScalar(0, 0, 255), 1, 8);
+            line(matImg, verticalRight, verticalRightEnd, cvScalar(0, 0, 255), 1, 8);
 
         imshow("Lanedetection", matImg);
         cvWaitKey(10);
-}
+        }
         
 
-////////////////Simplicity is the ultimate sophistication.///////////////
+        // detect intersection
         SteeringData sd;
         VehicleControl vc;
-        // if all 3 vertical lines detects white pixels && left and right are empty
-if ((FindWhiteLine(verticalLeftEnd.y)==true) && (FindWhiteLine(verticalRightEnd.y)==true)){
-    if ((FindWhiteLine(centerEnd.y)==true)){
-        sd.setExampleData(20);
-        //vc.setSpeed(0);
-    }
-}
-// {
-       
-//         // if((FindWhiteLine(rightTopEnd.x)==false) && (FindWhiteLine(leftTopEnd.x)==false))
-//         // {
-//         //      //keep going
-//         //     cout << "State: Intersection" << endl;
-//         //     sd.setExampleData(0);
-//         //     vc.setSpeed(0);
-//         // }
-// }
+        // if all 3 vertical lines detects white pixels && right is empty
+        if ((FindWhiteLine(verticalLeftEnd.y)==true) && (FindWhiteLine(verticalRightEnd.y)==true)){
+            if (FindWhiteLine(centerEnd.y)==true){
+                intersection = 1;
+                cout << "State: Intersection" << endl; //so far the program does not detect....
+            // sd.setExampleData(20);
+            // vc.setSpeed(0);
+            }
+        }
+
+        //if((FindWhiteLine(rightTopEnd.x)==false) && (FindWhiteLine(leftTopEnd.x)==false)){           
+        //keep going
+        //cout << "State: Intersection" << endl;
+            //sd.setExampleData(20);
+            //vc.setSpeed(0);
+        //}
 
         //Need too make dynamic steering
         //SteeringData sd;
         //((bRightPointEnd.x < 478 && rightPointTopEnd.x>280)
         //if(rightMid.x < 478 && rightTopEnd.x>300)
-        if(rightMid.x < 500 && rightTopEnd.x > 300){
-        sd.setExampleData(-10);
-        }else if(leftBot.x > 190 || leftMidEnd.x > 190 || leftTopEnd.x > 200){
-        sd.setExampleData(14);
+        if(intersection == 0){
+            if(rightMid.x < 500 && rightTopEnd.x > 300){
+            sd.setExampleData(-10);
+                }else if(leftBot.x > 190 || leftMidEnd.x > 190 || leftTopEnd.x > 200){
+                sd.setExampleData(14);
+                }
+        }else if(intersection == 1){
+        sd.setExampleData(0);
         }
 
         //TODO: Start here.
