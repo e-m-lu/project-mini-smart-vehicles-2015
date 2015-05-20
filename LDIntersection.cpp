@@ -57,64 +57,64 @@ namespace msv {
 
     LaneDetector::~LaneDetector() {}
     void LaneDetector::setUp() {
-	    // This method will be call automatically _before_ running body().
-	    if (m_debug) {
-		    // Create an OpenCV-window.
-		    cvNamedWindow("WindowShowImage", CV_WINDOW_AUTOSIZE);
-		    cvMoveWindow("WindowShowImage", 300, 100);
-	    }
+        // This method will be call automatically _before_ running body().
+        if (m_debug) {
+            // Create an OpenCV-window.
+            cvNamedWindow("WindowShowImage", CV_WINDOW_AUTOSIZE);
+            cvMoveWindow("WindowShowImage", 300, 100);
+        }
     }
 
     void LaneDetector::tearDown() {
-	    // This method will be call automatically _after_ return from body().
-	    if (m_image != NULL) {
-		    cvReleaseImage(&m_image);
-	    }
-	    if (m_debug) {
-		    cvDestroyWindow("WindowShowImage");
-	    }
+        // This method will be call automatically _after_ return from body().
+        if (m_image != NULL) {
+            cvReleaseImage(&m_image);
+        }
+        if (m_debug) {
+            cvDestroyWindow("WindowShowImage");
+        }
     }
     bool LaneDetector::readSharedImage(Container &c) {
-	    bool retVal = false;
-	    if (c.getDataType() == Container::SHARED_IMAGE) {
-		    SharedImage si = c.getData<SharedImage> ();
-		    // Check if we have already attached to the shared memory.
-		    if (!m_hasAttachedToSharedImageMemory) {
-			    m_sharedImageMemory
-					    = core::wrapper::SharedMemoryFactory::attachToSharedMemory(
-							    si.getName());
-		    }
-		    // Check if we could successfully attach to the shared memory.
-		    if (m_sharedImageMemory->isValid()) {
-			    // Lock the memory region to gain exclusive access. REMEMBER!!! DO NOT FAIL WITHIN lock() / unlock(), otherwise, the image producing process would fail.
-			    m_sharedImageMemory->lock();{
-				    const uint32_t numberOfChannels = 3;
-				    // For example, simply show the image.
-				    if (m_image == NULL) {
-					    m_image = cvCreateImage(cvSize(si.getWidth(), si.getHeight()), IPL_DEPTH_8U, numberOfChannels);
-				    }
-				    // Copying the image data is very expensive...
-				    if (m_image != NULL) {
-					    memcpy(m_image->imageData,
-							   m_sharedImageMemory->getSharedMemory(),
-							   si.getWidth() * si.getHeight() * numberOfChannels);
-				    }
-			    }
-			    // Release the memory region so that the image produce (i.e. the camera for example) can provide the next raw image data.
-			    m_sharedImageMemory->unlock();
-			    // Mirror the image.
-			    cvFlip(m_image, 0, -1);
-			    retVal = true;
-		    }
-	    }
-	    return retVal;
+        bool retVal = false;
+        if (c.getDataType() == Container::SHARED_IMAGE) {
+            SharedImage si = c.getData<SharedImage> ();
+            // Check if we have already attached to the shared memory.
+            if (!m_hasAttachedToSharedImageMemory) {
+                m_sharedImageMemory
+                        = core::wrapper::SharedMemoryFactory::attachToSharedMemory(
+                                si.getName());
+            }
+            // Check if we could successfully attach to the shared memory.
+            if (m_sharedImageMemory->isValid()) {
+                // Lock the memory region to gain exclusive access. REMEMBER!!! DO NOT FAIL WITHIN lock() / unlock(), otherwise, the image producing process would fail.
+                m_sharedImageMemory->lock();{
+                    const uint32_t numberOfChannels = 3;
+                    // For example, simply show the image.
+                    if (m_image == NULL) {
+                        m_image = cvCreateImage(cvSize(si.getWidth(), si.getHeight()), IPL_DEPTH_8U, numberOfChannels);
+                    }
+                    // Copying the image data is very expensive...
+                    if (m_image != NULL) {
+                        memcpy(m_image->imageData,
+                               m_sharedImageMemory->getSharedMemory(),
+                               si.getWidth() * si.getHeight() * numberOfChannels);
+                    }
+                }
+                // Release the memory region so that the image produce (i.e. the camera for example) can provide the next raw image data.
+                m_sharedImageMemory->unlock();
+                // Mirror the image.
+                cvFlip(m_image, 0, -1);
+                retVal = true;
+            }
+        }
+        return retVal;
 
     }
 // finds the white line
 bool FindWhiteLine(Vec3b white)
 { 
-	bool color =  false;
-	uchar blue = white.val[0];
+    bool color =  false;
+    uchar blue = white.val[0];
     uchar green = white.val[1];
     uchar red = white.val[2];
     if(blue == 255 && green == 255 && red == 255)
@@ -126,11 +126,11 @@ bool FindWhiteLine(Vec3b white)
 // extends the line until whiteline is found
 Point DrawingLines(Mat img , Point point,bool right)
 {
-	       int cols = img.cols;
-	       Vec3b drawingLine = img.at<Vec3b>(point); //defines the color at current positions
+           int cols = img.cols;
+           Vec3b drawingLine = img.at<Vec3b>(point); //defines the color at current positions
            while(point.x != cols){
-           	if(right == true)
-           	{
+            if(right == true)
+            {
             point.x = point.x +1; //increases the line too the right
             drawingLine = img.at<cv::Vec3b>(point); 
             if(FindWhiteLine(drawingLine)){ // quites incase white line is found
@@ -138,7 +138,7 @@ Point DrawingLines(Mat img , Point point,bool right)
             }
         }
         else if(right == false)
-           	{
+            {
             point.x = point.x -1; //Decrease the line too the left
             drawingLine = img.at<cv::Vec3b>(point); 
             if(FindWhiteLine(drawingLine)){ // quites incase white line is found
@@ -153,19 +153,19 @@ Point DrawingVertical(Mat img, Point point, bool top)
 {
         int rows = img.rows;
         Vec3b drawVertical = img.at<Vec3b>(point);
-        //Vec3b drawingLine = img.at<Vec3b>(point);
-        while(point.y != rows/2+70){
+        Vec3b drawingLine = img.at<Vec3b>(point);
+        while(point.y != rows-100){
             if(top == false)
             {
             point.y = point.y-1; 
             drawVertical = img.at<cv::Vec3b>(point); 
                 if(FindWhiteLine(drawVertical)==true){
-                    //if (FindWhiteLine(drawingLine)==false){
+                    if (FindWhiteLine(drawingLine)==false){
                     //    intersection = 1;
                         cout << "State: Intersection" << endl;
                         sd.setExampleData(0);
                         //break;
-                    //}
+                    }
                 }
             }
         } 
@@ -177,7 +177,7 @@ Point DrawingVertical(Mat img, Point point, bool top)
     // written by Nicolas Kheirallah
     void LaneDetector::processImage() {
 
-		//http://docs.opencv.org/doc/user_guide/ug_mat.html   Handeling images
+        //http://docs.opencv.org/doc/user_guide/ug_mat.html   Handeling images
         Mat matImg(m_image);  //IPL is so deprecated it isnt even funny 
         Mat gray; // for converting to gray
 
@@ -187,7 +187,7 @@ Point DrawingVertical(Mat img, Point point, bool top)
         Canny(gray, canny, 50, 170, 3); //inputing Canny limits 
         cvtColor(canny, matImg, CV_GRAY2BGR); //Converts back from gray
 
-		// get matrix size  http://docs.opencv.org/modules/core/doc/basic_structures.html
+        // get matrix size  http://docs.opencv.org/modules/core/doc/basic_structures.html
         int rows = matImg.rows;
         int cols = matImg.cols;
 
@@ -201,7 +201,7 @@ Point DrawingVertical(Mat img, Point point, bool top)
         center.x = cols/2;   
         center.y = rows; 
         centerEnd.x = center.x;   
-        centerEnd.y = rows-100;
+        centerEnd.y = rows-50;
 
         //Point verticalRight;
         //Point verticalRightEnd;
@@ -228,7 +228,7 @@ Point DrawingVertical(Mat img, Point point, bool top)
 
         bRightPoint.x = cols/2; 
         bRightPoint.y = 350;
-		bRightPointmid.x=cols/2; 
+        bRightPointmid.x=cols/2; 
         bRightPointmid.y =325;
         rightPointTop.x = cols/2; 
         rightPointTop.y = 275; 
@@ -254,24 +254,24 @@ Point DrawingVertical(Mat img, Point point, bool top)
         lMidPointEnd.y = lMidPoint.y;
 
 // assigns the point the extended value 
-		bLeftPoint =DrawingLines(matImg,bLeftPoint,false);
-		bRightPointEnd=DrawingLines(matImg,bRightPointEnd,true);
-		bRightPointmid=DrawingLines(matImg,bRightPointmid,true);
-		rightPointTopEnd =DrawingLines(matImg,rightPointTopEnd,true);
-		lMidPointEnd =DrawingLines(matImg,lMidPointEnd,false);
-		ltopPointEnd =DrawingLines(matImg,ltopPointEnd,false);
+        bLeftPoint =DrawingLines(matImg,bLeftPoint,false);
+        bRightPointEnd=DrawingLines(matImg,bRightPointEnd,true);
+        bRightPointmid=DrawingLines(matImg,bRightPointmid,true);
+        rightPointTopEnd =DrawingLines(matImg,rightPointTopEnd,true);
+        lMidPointEnd =DrawingLines(matImg,lMidPointEnd,false);
+        ltopPointEnd =DrawingLines(matImg,ltopPointEnd,false);
 
        if (m_debug) {
-       	  //http://docs.opencv.org/doc/tutorials/core/basic_geometric_drawing/basic_geometric_drawing.html
-       	       line(matImg, center,centerEnd,cvScalar(0, 0, 255),1, 8); //centralline
+          //http://docs.opencv.org/doc/tutorials/core/basic_geometric_drawing/basic_geometric_drawing.html
+               line(matImg, center,centerEnd,cvScalar(0, 0, 255),1, 8); //centralline
                //line(matImg, verticalRight, verticalRightEnd, cvScalar(0, 0, 255), 1, 8);
 
-       	       line(matImg, bRightPoint,bRightPointEnd,cvScalar(0, 165, 255),1, 8); //bottom right line
-       	       line(matImg, lMidPoint,lMidPointEnd,cvScalar(255, 225, 0),1, 8); //LeftMid line
-       	       line(matImg, bRightPoint,bLeftPoint,cvScalar(255, 0, 0),1, 8);//LeftBottom line
-       	       line(matImg, ltopPoint,ltopPointEnd,cvScalar(130, 0, 75),1, 8); //TopLeft line
-       	       line(matImg, bRightPointmid,rightPointMidEnd,cvScalar(238, 130, 238),1, 8); //rightmid line
-       	       line(matImg, rightPointTop,rightPointTopEnd,cvScalar(52, 64, 76),1, 8); //TopRight line
+               line(matImg, bRightPoint,bRightPointEnd,cvScalar(0, 165, 255),1, 8); //bottom right line
+               line(matImg, lMidPoint,lMidPointEnd,cvScalar(255, 225, 0),1, 8); //LeftMid line
+               line(matImg, bRightPoint,bLeftPoint,cvScalar(255, 0, 0),1, 8);//LeftBottom line
+               line(matImg, ltopPoint,ltopPointEnd,cvScalar(130, 0, 75),1, 8); //TopLeft line
+               line(matImg, bRightPointmid,rightPointMidEnd,cvScalar(238, 130, 238),1, 8); //rightmid line
+               line(matImg, rightPointTop,rightPointTopEnd,cvScalar(52, 64, 76),1, 8); //TopRight line
          imshow("Lanedetection", matImg);
          cvWaitKey(10);
 }
@@ -304,9 +304,9 @@ Point DrawingVertical(Mat img, Point point, bool top)
     // This method will do the main data processing job.
     // Therefore, it tries to open the real camera first. If that fails, the virtual camera images from camgen are used.
     ModuleState::MODULE_EXITCODE LaneDetector::body() {
-	    // Get configuration data.
-	    KeyValueConfiguration kv = getKeyValueConfiguration();
-	    m_debug = kv.getValue<int32_t> ("lanedetector.debug") == 1;
+        // Get configuration data.
+        KeyValueConfiguration kv = getKeyValueConfiguration();
+        m_debug = kv.getValue<int32_t> ("lanedetector.debug") == 1;
 
         Player *player = NULL;
 /*
@@ -322,33 +322,33 @@ Point DrawingVertical(Mat img, Point point, bool top)
 */
 
         // "Working horse."
-	    while (getModuleState() == ModuleState::RUNNING) {
-		    bool has_next_frame = false;
+        while (getModuleState() == ModuleState::RUNNING) {
+            bool has_next_frame = false;
 
-		    // Use the shared memory image.
+            // Use the shared memory image.
             Container c;
             if (player != NULL) {
-		        // Read the next container from file.
+                // Read the next container from file.
                 c = player->getNextContainerToBeSent();
             }
             else {
-		        // Get the most recent available container for a SHARED_IMAGE.
-		        c = getKeyValueDataStore().get(Container::SHARED_IMAGE);
+                // Get the most recent available container for a SHARED_IMAGE.
+                c = getKeyValueDataStore().get(Container::SHARED_IMAGE);
             }
 
-		    if (c.getDataType() == Container::SHARED_IMAGE) {
-			    // Example for processing the received container.
-			    has_next_frame = readSharedImage(c);
-		    }
+            if (c.getDataType() == Container::SHARED_IMAGE) {
+                // Example for processing the received container.
+                has_next_frame = readSharedImage(c);
+            }
 
-		    // Process the read image.
-		    if (true == has_next_frame) {
-			    processImage();
-		    }
-	    }
+            // Process the read image.
+            if (true == has_next_frame) {
+                processImage();
+            }
+        }
 
         OPENDAVINCI_CORE_DELETE_POINTER(player);
 
-	    return ModuleState::OKAY;
+        return ModuleState::OKAY;
     }
 } // msv
