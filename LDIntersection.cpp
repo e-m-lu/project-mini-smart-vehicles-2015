@@ -48,6 +48,7 @@ namespace msv {
 
     SteeringData sd;
     VehicleControl vc;
+    int intersection = 0;
 
     LaneDetector::LaneDetector(const int32_t &argc, char **argv) : ConferenceClientModule(argc, argv, "lanedetector"),
         m_hasAttachedToSharedImageMemory(false),
@@ -161,10 +162,11 @@ Point DrawingVertical(Mat img, Point point, bool top)
             drawVertical = img.at<cv::Vec3b>(point); 
                 if(FindWhiteLine(drawVertical)==true){
                     if (FindWhiteLine(drawingLine)==false){
-                    //    intersection = 1;
+                        //intersection = 1;
                         cout << "State: Intersection" << endl;
                         sd.setExampleData(0);
                         //break;
+                        //cout << "State : Intersection passed" << endl;
                     }
                 }
             }
@@ -278,6 +280,9 @@ Point DrawingVertical(Mat img, Point point, bool top)
         //Need too make dynamic steering
         //SteeringData sd;
         //((bRightPointEnd.x < 478 && rightPointTopEnd.x>280)
+        //while (intersection == 0){
+
+
         if(bRightPointmid.x < 478 && rightPointTopEnd.x>300)
         {
         sd.setExampleData(-10);
@@ -286,6 +291,8 @@ Point DrawingVertical(Mat img, Point point, bool top)
         {
         sd.setExampleData(14);
         }
+
+        //}
 
         //TODO: Start here.
         // 1. Do something with the image m_image here, for example: find lane marking features, optimize quality, ...
