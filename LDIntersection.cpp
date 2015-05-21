@@ -154,18 +154,15 @@ Point DrawingVertical(Mat img, Point point, bool top)
 {
         int rows = img.rows;
         Vec3b drawVertical = img.at<Vec3b>(point);
-        Vec3b drawingLine = img.at<Vec3b>(point);
+        //Vec3b drawingLine = img.at<Vec3b>(point);
         while(point.y != rows-100){
             if(top == false)
             {
             point.y = point.y-1; 
             drawVertical = img.at<cv::Vec3b>(point); 
                 if(FindWhiteLine(drawVertical)==true){
-                    //if (FindWhiteLine(drawingLine)==false){
-                        //intersection = 1;
                         cout << "State: Intersection" << endl;
                         sd.setExampleData(0);
-                    //}
                 }
             }
         } 
@@ -232,8 +229,7 @@ Point DrawingVertical(Mat img, Point point, bool top)
 }
 //end of Nicolas part
 //Emily part
-        //((bRightPointEnd.x < 478 && rightPointTopEnd.x>280)
-        if((myPointRightEnd[2].x < 478 && myPointRightEnd[0].x>300))
+        if((myPointRightEnd[2].x < 478 && myPointRightEnd[0].x > 300))
         {
         sd.setExampleData(-10);
         }
