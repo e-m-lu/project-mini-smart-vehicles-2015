@@ -95,16 +95,6 @@ namespace msv {
                 // Create vehicle control data.
                 VehicleControl vc;
 
-                ////////////////////////////////////////////STOPLINE////////////////////////////////////////
-                //cout << "stop car" << sd.stopCar() << endl;
-
-                //if (sd.stopCar() == true){
-                //    vc.setSpeed(0);
-                //}else{
-                //    vc.setSpeed(speed);
-                //}
-                ////////////////////////////////////////////////////////////////////////////////////////////
-
                 // With setSpeed you can set a desired speed for the vehicle in the range of -2.0 (backwards) .. 0 (stop) .. +2.0 (forwards)
                 //double speed;
                 vc.setSpeed(10.0);
