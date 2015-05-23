@@ -188,8 +188,8 @@ Point DrawingVertical(Mat img, Point point, bool top)
         int rows = matImg.rows;
 
 
-		if(intersection == true)
-		{
+	if(intersection == true)
+	{
         spd.setSpeedData(0);
     	}
     	else if(intersection == false)
