@@ -55,7 +55,6 @@ namespace msv {
         // This method will do the main data processing job.
         ModuleState::MODULE_EXITCODE Driver::body() {
 
-
             while (getModuleState() == ModuleState::RUNNING) {
                 // In the following, you find example for the various data sources that are available:
 
@@ -78,31 +77,21 @@ namespace msv {
                 Container containerSteeringData = getKeyValueDataStore().get(Container::USER_DATA_1);
                 SteeringData sd = containerSteeringData.getData<SteeringData> ();
                 cerr << "Most recent steering data: '" << sd.toString() << "'" << endl;
-
-
-
-                /////////////////////////////////////////// OTHER DATA//////////////////////////////////
-                //Container containerIntersectionData = getKeyValueDataStore().get(Container::USER_DATA_2);
-                // IntersectionData id = containerIntersectionData.getData<IntersectionData> ();
-
-                //Container containerSpeedData = getKeyValueDataStore().get(Container::USER_DATA_3);
-                // SpeedData spd = containerSpeedData.getData<SpeedData>();
-                // speed = spd.getSpeed;
-
-                // Design your control algorithm here depending on the input data from above.
-
+                
+                Container containerSpeedData = getKeyValueDataStore().get(Container::USER_DATA_2);
+                SpeedData spd = containerSpeedData.getData<SpeedData>();
+                cerr << "Most recent Speed data: '" << spd.toString() << "'" << endl;
 
                 // Create vehicle control data.
                 VehicleControl vc;
 
-                // With setSpeed you can set a desired speed for the vehicle in the range of -2.0 (backwards) .. 0 (stop) .. +2.0 (forwards)
-                //double speed;
-                vc.setSpeed(10.0);
+                double speed = spd.getSpeedData(); //Set desired speed
+                vc.setSpeed(speed);            
 
-                // With setSteeringWheelAngle, you can steer in the range of -26 (left) .. 0 (straight) .. +25 (right)
-                double angle = sd.getExampleData();
-                vc.setSteeringWheelAngle(angle * Constants::DEG2RAD);
+                    // With setSteeringWheelAngle, you can steer in the range of -26 (left) .. 0 (straight) .. +25 (right)
+                double steeringAngle = sd.getExampleData();
 
+                vc.setSteeringWheelAngle(steeringAngle * Constants::DEG2RAD);
 
                 // You can also turn on or off various lights:
                 vc.setBrakeLights(false);
