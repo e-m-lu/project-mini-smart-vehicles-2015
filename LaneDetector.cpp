@@ -156,7 +156,7 @@ Point DrawingVertical(Mat img, Point point, bool top)
 {
         int rows = img.rows;
         Vec3b drawVertical = img.at<Vec3b>(point);
-        while(point.y != rows-100){
+        while(point.y != rows-150){
             if(top == false)
             {
             point.y = point.y-1; 
