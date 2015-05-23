@@ -156,8 +156,7 @@ Point DrawingVertical(Mat img, Point point, bool top)
 {
         int rows = img.rows;
         Vec3b drawVertical = img.at<Vec3b>(point);
-        //Vec3b drawingLine = img.at<Vec3b>(point);
-        while(point.y != rows-150){
+        while(point.y != rows-100){
             if(top == false)
             {
             point.y = point.y-1; 
@@ -187,15 +186,17 @@ Point DrawingVertical(Mat img, Point point, bool top)
         // get matrix size  http://docs.opencv.org/modules/core/doc/basic_structures.html
         int cols = matImg.cols;
         int rows = matImg.rows;
-if( intersection == true)
-{
+
+
+		if(intersection == true)
+		{
         spd.setSpeedData(0);
-    }
-    else if(intersection == false)
-    {
-         spd.setSpeedData(2);
-    }
-        // Emilys part
+    	}
+    	else if(intersection == false)
+    	{
+        spd.setSpeedData(2);
+    	}
+  
         Point center;             
         Point centerEnd;
 
@@ -236,13 +237,12 @@ if( intersection == true)
 }
 //end of Nicolas part
 //Emily part
-        //Need too make dynamic steering
         //320 == roi Width
         //160  == ROI Height
         //((bRightPointEnd.x < 478 && rightPointTopEnd.x>280)
-        if((myPointRightEnd[2].x < 480 && myPointRightEnd[0].x>320))
+        if((myPointRightEnd[2].x < 480 && myPointRightEnd[0].x > 320))
         {
-        double steeringAngle = -1 * (myPointRightEnd[2].x % 26); 
+        double steeringAngle = -1 * (myPointRightEnd[2].x % 26);
         sd.setExampleData(steeringAngle+2); // +2 keeps the car straight       
          }   
         else if(myPointLeftEnd[0].x > 160)
