@@ -152,6 +152,7 @@ Point DrawingLines(Mat img , Point point,bool right)
 //end of Nicolas part
 
 //Emily
+//todo: disbale intersection during OT and parking
 Point DrawingVertical(Mat img, Point point, bool top)
 {
         int rows = img.rows;
