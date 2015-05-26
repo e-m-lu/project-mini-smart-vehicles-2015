@@ -154,23 +154,23 @@ Point DrawingLines(Mat img , Point point,bool right)
 //end of Nicolas part
 
 //Emily
-Point DrawingVertical(Mat img, Point point, bool top)
-{
-        int rows = img.rows;
-        Vec3b drawVertical = img.at<Vec3b>(point);
-        while(point.y != rows-150){
-            if(top == false)
-            {
-            point.y = point.y-1; 
-            drawVertical = img.at<cv::Vec3b>(point); 
-                if(FindWhiteLine(drawVertical)==true){
-                   cout << "State: Intersection" << endl;
-                   intersection = true;
-                }
-            }
-        } 
-        return point;
-}
+// Point DrawingVertical(Mat img, Point point, bool top)
+// {
+//         int rows = img.rows;
+//         Vec3b drawVertical = img.at<Vec3b>(point);
+//         while(point.y != rows-150){
+//             if(top == false)
+//             {
+//             point.y = point.y-1; 
+//             drawVertical = img.at<cv::Vec3b>(point); 
+//                 if(FindWhiteLine(drawVertical)==true){
+//                    cout << "State: Intersection" << endl;
+//                    intersection = true;
+//                 }
+//             }
+//         } 
+//         return point;
+// }
 //End of Emily's part
     // You should start your work in this method.
     //Nicolas Part
@@ -187,27 +187,17 @@ Point DrawingVertical(Mat img, Point point, bool top)
 
         // get matrix size  http://docs.opencv.org/modules/core/doc/basic_structures.html
         int cols = matImg.cols;
-        int rows = matImg.rows;
-
-
-		if(intersection == true)
-		{
-        spd.setSpeedData(0);
-    	}
-    	else if(intersection == false)
-    	{
-        spd.setSpeedData(2);
-    	}
+        //int rows = matImg.rows;
   
-        Point center;             
-        Point centerEnd;
+        // Point center;             
+        // Point centerEnd;
 
-        center.x = cols/2;   
-        center.y = rows; 
-        centerEnd.x = center.x;   
-        centerEnd.y = rows-50; 
+        // center.x = cols/2;   
+        // center.y = rows; 
+        // centerEnd.x = center.x;   
+        // centerEnd.y = rows-50; 
 
-        centerEnd = DrawingVertical(matImg, centerEnd, false);
+        // centerEnd = DrawingVertical(matImg, centerEnd, false);
         //End of Emilys Part
 
         Point myPointStart[4]; // array of startpoints
@@ -216,9 +206,10 @@ Point DrawingVertical(Mat img, Point point, bool top)
         for(int i=1; i<4;i++)
         {
             myPointStart[0].x=cols/2;  // middle of the img
-            myPointStart[0].y=275; // start point of the Y axis , 
+            myPointStart[0].y=275; // start point of the Y axis , //275
             myPointStart[i].x=myPointStart[0].x; //startpoint of each line
-            myPointStart[i].y=myPointStart[i-1].y+25; // Each point has a new Y-point 
+            myPointStart[i].y=myPointStart[i-1].y+25; // Each point has a new Y-point  
+            //changes from 25 to 50, larger gap for reaching the intersection
         }
         for(int i=0; i<4;i++)
         {
@@ -233,7 +224,7 @@ Point DrawingVertical(Mat img, Point point, bool top)
             line(matImg, myPointStart[i],myPointRightEnd[i],cvScalar(0, 165, 255),1, 8); //Right line
             line(matImg, myPointStart[i],myPointLeftEnd[i],cvScalar(52, 64, 76),1, 8); //Left line line
          }
-            line(matImg, center,centerEnd,cvScalar(0, 0, 255),1, 8); //centralline
+            //line(matImg, center,centerEnd,cvScalar(0, 0, 255),1, 8); //centralline
          imshow("Lanedetection", matImg);
          cvWaitKey(10);
 }
@@ -255,13 +246,41 @@ Point DrawingVertical(Mat img, Point point, bool top)
 		// }
 
 
-		int desiredDistRight = 185;
-		//cout << desiredDistRight << endl; //185
-		int difference = (myPointRightEnd[0].x - 240) - desiredDistRight; // - middle - desiredright
-		double steeringAngle = difference * 0.2; //calculate constant
-		sd.setExampleData(steeringAngle);
+			if (myPointRightEnd[0].x > 640 && myPointRightEnd[1].x > 640)
+			{
+				intersection = true;
+			}
+			if(intersection == true)
+		 	{
+  		       spd.setSpeedData(0);
+  		   	}
+  		   	else if(intersection == false)
+  		   	{
+  		       spd.setSpeedData(2);
+  		   	}
 
-		//same for left lane
+		//use bottom line in case top lines disappear while turning or in intersection
+		int desiredDistRight = 185; //desired dist to the side lane
+		//int desiredDistLeft = 16;
+		//cout << desiredDistLeft << endl;
+		int difference;
+		double steeringAngle;
+
+		if (myPointRightEnd[0].x > 185 && intersection == false){
+			difference = (myPointRightEnd[0].x - 200) - desiredDistRight; // actual distance - middle - desiredright
+			steeringAngle = difference * 0.2;
+			sd.setExampleData(steeringAngle);
+			spd.setSpeedData(2);
+			}
+			// if (myPointleftEnd[0].x < 16) //follow left
+			// {
+			// difference = (myPointLeftEnd[0].x - 200) + desiredDistLeft;
+			// steeringAngle = difference * 0.2;
+			// sd.setExampleData(steeringAngle);
+			// spd.setSpeedData(2);
+			// }
+
+
 
         // if((myPointRightEnd[2].x < 480 && myPointRightEnd[0].x > 320)) //480 left side, 320 middle, 160 right
         // {
