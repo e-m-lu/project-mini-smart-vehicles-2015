@@ -154,23 +154,21 @@ Point DrawingLines(Mat img , Point point,bool right)
 //end of Nicolas part
 
 //Emily
-// Point DrawingVertical(Mat img, Point point, bool top)
-// {
-//         int rows = img.rows;
-//         Vec3b drawVertical = img.at<Vec3b>(point);
-//         while(point.y != rows-150){
-//             if(top == false)
-//             {
-//             point.y = point.y-1; 
-//             drawVertical = img.at<cv::Vec3b>(point); 
-//                 if(FindWhiteLine(drawVertical)==true){
-//                    cout << "State: Intersection" << endl;
-//                    intersection = true;
-//                 }
-//             }
-//         } 
-//         return point;
-// }
+  // Point DrawingVertical(Mat img, Point point, bool top)
+  // {
+  //         //int rows = img.rows;
+  //         Vec3b drawVertical = img.at<Vec3b>(point);
+  //             if(top == false)
+  //             {
+  //             	point.y = point.y-1; 
+  //             	drawVertical = img.at<cv::Vec3b>(point); 
+  //                 if(FindWhiteLine(drawVertical)==true){
+  //                    cout << "State: Intersection" << endl;
+  //                    intersection = true;
+  //                 }
+  //             }
+  //         } 
+  //                return point;
 //End of Emily's part
     // You should start your work in this method.
     //Nicolas Part
@@ -189,15 +187,15 @@ Point DrawingLines(Mat img , Point point,bool right)
         int cols = matImg.cols;
         //int rows = matImg.rows;
   
-        // Point center;             
-        // Point centerEnd;
+         // Point center;             
+         // Point centerEnd;
 
-        // center.x = cols/2;   
-        // center.y = rows; 
-        // centerEnd.x = center.x;   
-        // centerEnd.y = rows-50; 
+         // center.x = cols/2;   
+         // center.y = 275; 
+         // centerEnd.x = center.x;   
+         // centerEnd.y = 471; 
 
-        // centerEnd = DrawingVertical(matImg, centerEnd, false);
+         // centerEnd = DrawingVertical(matImg, centerEnd, false);
         //End of Emilys Part
 
         Point myPointStart[4]; // array of startpoints
@@ -229,70 +227,38 @@ Point DrawingLines(Mat img , Point point,bool right)
          cvWaitKey(10);
 }
 //end of Nicolas part
-//Emily part
-        //320 == roi Width
-        //160  == ROI Height
-
-		// int avDistLeft = myPointLeftEnd[i].x/4;
-		// int avDistRight = myPointRightEnd[i].x/4;
-
-		// double theta = atan(dy, dx);
-		// double steeringAngle = theta * 180/CV_PI;
-		// int dx = myPointLeftEnd[0].x - myPointStart[0].x; //bottom line - 3rd line 
-		// int dy = myPointStart[0].y -myPointStart[3].y;
-		// if (avDistRight > avDistLeft)
-		// {
-		// 	sd.setExampleData(steeringAngle);
-		// }
-
-
-			if (myPointRightEnd[0].x > 640 && myPointRightEnd[1].x > 640)
-			{
-				intersection = true;
-			}
-			if(intersection == true)
-		 	{
-  		       spd.setSpeedData(0);
-  		   	}
-  		   	else if(intersection == false)
-  		   	{
-  		       spd.setSpeedData(2);
-  		   	}
 
 		//use bottom line in case top lines disappear while turning or in intersection
-		int desiredDistRight = 185; //desired dist to the side lane
-		//int desiredDistLeft = 16;
-		//cout << desiredDistLeft << endl;
+		int desiredDistRight = 211; //desired dist to the side lane
 		int difference;
 		double steeringAngle;
+		//int print = myPointStart[3].y;
+		//cout << print << endl;
 
-		if (myPointRightEnd[0].x > 185 && intersection == false){
-			difference = (myPointRightEnd[0].x - 200) - desiredDistRight; // actual distance - middle - desiredright
-			steeringAngle = difference * 0.2;
+		//[3]494
+		//[2]471
+		//[1]448
+		//[0]425
+
+		//if (myPointRightEnd[0].x <= 425){
+			//(actual distance - middle) - desiredright = difference that needs to be adjusted
+			//when in staight road, this should be 0
+			difference = (myPointRightEnd[0].x - 214) - desiredDistRight;
+			steeringAngle = difference * 0.1;
 			sd.setExampleData(steeringAngle);
 			spd.setSpeedData(2);
-			}
-			// if (myPointleftEnd[0].x < 16) //follow left
-			// {
-			// difference = (myPointLeftEnd[0].x - 200) + desiredDistLeft;
-			// steeringAngle = difference * 0.2;
-			// sd.setExampleData(steeringAngle);
-			// spd.setSpeedData(2);
-			// }
+			//}
 
+			// when all right lines disappear, intersection found, go straight
+		if (myPointRightEnd[0].x > 425 && myPointRightEnd[1].x > 448 && myPointRightEnd[2].x > 471 && myPointRightEnd[3].x > 494)
+		{
+			cout << "print" << endl;
+			sd.setExampleData(0);
+			//spd.setSpeedData(0);
+		}
 
+			//todo: follow left for OT
 
-        // if((myPointRightEnd[2].x < 480 && myPointRightEnd[0].x > 320)) //480 left side, 320 middle, 160 right
-        // {
-        // double steeringAngle = -1 * (myPointRightEnd[2].x % 26);
-        // sd.setExampleData(steeringAngle+3); // +2 keeps the car straight       
-        // }
-        // else if(myPointLeftEnd[0].x > 160 || myPointLeftEnd[1].x > 160 || myPointLeftEnd[2].x > 160 || myPointLeftEnd[3].x > 160)
-        // {
-        // double steeringAngle = myPointRightEnd[0].x / 24.615384615;// 640/26 = 24.615384615;
-        // sd.setExampleData(steeringAngle);
-        // }	
-//End of emily part
         //TODO: Start here.
         // 1. Do something with the image m_image here, for example: find lane marking features, optimize quality, ...
         // 2. Calculate desired steering commands from your image features to be processed by driver.
