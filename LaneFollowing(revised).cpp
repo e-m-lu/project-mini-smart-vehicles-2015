@@ -166,16 +166,6 @@ Point DrawingLines(Mat img , Point point,bool right)
         // get matrix size  http://docs.opencv.org/modules/core/doc/basic_structures.html
         int cols = matImg.cols;
         //int rows = matImg.rows;
-  
-         // Point center;             
-         // Point centerEnd;
-
-         // center.x = cols/2;   
-         // center.y = 275; 
-         // centerEnd.x = center.x;   
-         // centerEnd.y = 471; 
-
-         // centerEnd = DrawingVertical(matImg, centerEnd, false);
 
         Point myPointStart[4]; // array of startpoints
         Point myPointRightEnd[4]; // array of rightEnd Point
@@ -222,10 +212,8 @@ Point DrawingLines(Mat img , Point point,bool right)
 
 	double steeringAngle;
 	int desiredDistRight = 211; //desired dist to the side lane
-		//int desiredDistLeft = 180;//(145 + 168 + 191 + 214)/4
+	//int desiredDistLeft = 180;//(145 + 168 + 191 + 214)/4
 	int difference;
-		//int difference3;
-		//int avg;
 		
 //(actual distance - dotted line) - desiredright = difference that needs to be adjusted. when in staight road, this should be 0
 if (myPointRightEnd[0].x > 500) //is Rn lost?
