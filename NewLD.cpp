@@ -48,7 +48,7 @@ namespace msv {
 
     SteeringData sd;
     SpeedData spd;
-    bool intersection = false;
+    //bool intersection = false;
 
     LaneDetector::LaneDetector(const int32_t &argc, char **argv) : ConferenceClientModule(argc, argv, "lanedetector"),
         m_hasAttachedToSharedImageMemory(false),
@@ -111,7 +111,7 @@ namespace msv {
         return retVal;
 
     }
-//Nicolas Part
+/*-----------Nicolas--------------*/
 // finds the white line
 bool FindWhiteLine(Vec3b white)
 { 
@@ -151,9 +151,9 @@ Point DrawingLines(Mat img , Point point,bool right)
     }
            return point;
 }
-//end of Nicolas part
+/*-----------Nicolas--------------*/
 
-//Emily
+/*-----------Emily--------------*/
   // Point DrawingVertical(Mat img, Point point, bool top)
   // {
   //         //int rows = img.rows;
@@ -169,9 +169,8 @@ Point DrawingLines(Mat img , Point point,bool right)
   //             }
   //         } 
   //                return point;
-//End of Emily's part
     // You should start your work in this method.
-    //Nicolas Part
+/*-----------Nicolas--------------*/
     void LaneDetector::processImage() {
 
         //http://docs.opencv.org/doc/user_guide/ug_mat.html   Handeling images
@@ -226,39 +225,78 @@ Point DrawingLines(Mat img , Point point,bool right)
          imshow("Lanedetection", matImg);
          cvWaitKey(10);
 }
-//end of Nicolas part
+/*-----------Nicolas--------------*/
+/*-----------Emily--------------*/
 
-		//use bottom line in case top lines disappear while turning or in intersection
-		int desiredDistRight = 211; //desired dist to the side lane
-		int difference;
-		double steeringAngle;
-		//int print = myPointStart[3].y;
-		//cout << print << endl;
-
+		//Right
 		//[3]494
 		//[2]471
 		//[1]448
 		//[0]425
 
-		//if (myPointRightEnd[0].x <= 425){
-			//(actual distance - middle) - desiredright = difference that needs to be adjusted
-			//when in staight road, this should be 0
-			difference = (myPointRightEnd[0].x - 214) - desiredDistRight;
-			steeringAngle = difference * 0.1;
-			sd.setExampleData(steeringAngle);
-			spd.setSpeedData(2);
-			//}
+		//Left
+		//[3] 145
+		//[2] 168
+		//[1] 191
+		//[0] 214
 
-			// when all right lines disappear, intersection found, go straight
-		if (myPointRightEnd[0].x > 425 && myPointRightEnd[1].x > 448 && myPointRightEnd[2].x > 471 && myPointRightEnd[3].x > 494)
-		{
-			cout << "print" << endl;
-			sd.setExampleData(0);
-			//spd.setSpeedData(0);
-		}
+	double steeringAngle;
+	int desiredDistRight = 211; //desired dist to the side lane
+		//int desiredDistLeft = 180;//(145 + 168 + 191 + 214)/4
+	int difference;
+		//int difference3;
+		//int avg;
+		
+//(actual distance - dotted line) - desiredright = difference that needs to be adjusted. when in staight road, this should be 0
+if (myPointRightEnd[0].x <= 425 || myPointRightEnd[1].x <= 448 || myPointRightEnd[2].x <= 371 || myPointRightEnd[3].x <= 494) //can follow right
+{
+	if (myPointRightEnd[3].x > myPointRightEnd[0].x && myPointLeftEnd[3].x < -150)
+	{
+		cout << "intersection" << endl;
+		spd.setSpeedData(0);
+	}
+	else
+	{
 
-			//todo: follow left for OT
+	difference = (myPointRightEnd[0].x - 214) - desiredDistRight; //use bottom line in case top lines disappear while turning or in intersection
+	steeringAngle = difference * 0.1;
+	sd.setExampleData(steeringAngle);
+	spd.setSpeedData(2);
 
+	}
+}
+	// else if(myPointLeftEnd[3].x < -100 && myPointRightEnd[3].x > 450)// if no lines are found on the right
+	// 	{
+	// 	cout << "intersection" << endl;
+ // 		sd.setExampleData(0);
+ // 		spd.setSpeedData(0);
+	// 	}
+
+		//if (myPointLeftEnd[3].x < -150 && myPointRightEnd[3].x > 450)
+
+	
+// if (myPointRightEnd[3].x > 494 && myPointRightEnd[2].x > 471) // if cant reach right, follow left
+// {
+// 	difference = (myPointLeftEnd[0].x - 34) - desiredDistLeft;
+// 	difference1 = (myPointLeftEnd[1].x - 11) -desiredDistLeft;
+// 	difference2 =(myPointLeftEnd[2].x + 12 ) - desiredDistLeft;
+// 	difference3 = (myPointLeftEnd[3].x + 35) - desiredDistLeft;
+// 	avg = (difference + difference3) / 2;
+// 	steeringAngle = avg * 0.1;
+// 	sd.setExampleData(steeringAngle);
+// 	spd.setSpeedData(2);
+// }
+
+// when all right lines disappear, and no dotted lines are found, car is going kinda straight = intersection found, go straight
+ //else if(myPointRightEnd[3].x > 494 && myPointRightEnd[2].x > 471 && myPointLeftEnd[3].x < 145)
+ // {
+ // 	if(steeringAngle < 1 && steeringAngle > -1)
+ // 	{
+ // 		cout << "intersection" << endl;
+ // 		sd.setExampleData(0);
+ // 		spd.setSpeedData(0);
+ // 	}
+ // }
         //TODO: Start here.
         // 1. Do something with the image m_image here, for example: find lane marking features, optimize quality, ...
         // 2. Calculate desired steering commands from your image features to be processed by driver.
