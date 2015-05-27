@@ -228,16 +228,18 @@ Point DrawingLines(Mat img , Point point,bool right)
 		//int avg;
 		
 //(actual distance - dotted line) - desiredright = difference that needs to be adjusted. when in staight road, this should be 0
-if (myPointRightEnd[0].x > 425) //is Rn lost?
+if (myPointRightEnd[0].x > 430) //is Rn lost?
 {
 		if (myPointLeftEnd[0].x < 214 || myPointLeftEnd[1].x < 191 || myPointLeftEnd[3].x < 145) // is left lost?
 		{
-	 		sd.setExampleData(90); // yes, sharp turn right
+	 		sd.setExampleData(90);
+	 		spd.setSpeedData(0); // yes, sharp turn right
 		}else{
 			cout << "intersection" << endl; //no, intersection
 			spd.setSpeedData(0);
 			sd.setExampleData(0);
 		}
+
 }
 else // no, follow right
 {
