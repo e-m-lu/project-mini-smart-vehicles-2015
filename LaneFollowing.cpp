@@ -151,26 +151,7 @@ Point DrawingLines(Mat img , Point point,bool right)
     }
            return point;
 }
-/*-----------Nicolas--------------*/
 
-/*-----------Emily--------------*/
-  // Point DrawingVertical(Mat img, Point point, bool top)
-  // {
-  //         //int rows = img.rows;
-  //         Vec3b drawVertical = img.at<Vec3b>(point);
-  //             if(top == false)
-  //             {
-  //             	point.y = point.y-1; 
-  //             	drawVertical = img.at<cv::Vec3b>(point); 
-  //                 if(FindWhiteLine(drawVertical)==true){
-  //                    cout << "State: Intersection" << endl;
-  //                    intersection = true;
-  //                 }
-  //             }
-  //         } 
-  //                return point;
-    // You should start your work in this method.
-/*-----------Nicolas--------------*/
     void LaneDetector::processImage() {
 
         //http://docs.opencv.org/doc/user_guide/ug_mat.html   Handeling images
@@ -195,7 +176,6 @@ Point DrawingLines(Mat img , Point point,bool right)
          // centerEnd.y = 471; 
 
          // centerEnd = DrawingVertical(matImg, centerEnd, false);
-        //End of Emilys Part
 
         Point myPointStart[4]; // array of startpoints
         Point myPointRightEnd[4]; // array of rightEnd Point
@@ -248,21 +228,26 @@ Point DrawingLines(Mat img , Point point,bool right)
 		//int avg;
 		
 //(actual distance - dotted line) - desiredright = difference that needs to be adjusted. when in staight road, this should be 0
-if (myPointRightEnd[0].x <= 425 || myPointRightEnd[1].x <= 448 || myPointRightEnd[2].x <= 371 || myPointRightEnd[3].x <= 494) //can follow right
+if (myPointRightEnd[0].x > 425) //is Rn lost?
 {
-	 if (myPointRightEnd[3].x > myPointRightEnd[0].x && myPointLeftEnd[3].x < -150)
-	 {
-	 	cout << "intersection" << endl;
-	 	spd.setSpeedData(0);
-	 }
-	 else
-	 {
-
+		if (myPointLeftEnd[0].x < 214 || myPointLeftEnd[1].x < 191 || myPointLeftEnd[3].x < 145) // is left lost?
+		{
+	 		sd.setExampleData(90); // yes, sharp turn right
+		}else{
+			cout << "intersection" << endl; //no, intersection
+			spd.setSpeedData(0);
+			sd.setExampleData(0);
+		}
+}
+else // no, follow right
+{
 	difference = (myPointRightEnd[0].x - 214) - desiredDistRight; //use bottom line in case top lines disappear while turning or in intersection
 	steeringAngle = difference * 0.1;
 	sd.setExampleData(steeringAngle);
 	spd.setSpeedData(2);
 }
+
+
 
         //TODO: Start here.
         // 1. Do something with the image m_image here, for example: find lane marking features, optimize quality, ...
